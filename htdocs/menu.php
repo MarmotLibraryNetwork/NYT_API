@@ -10,7 +10,7 @@ error_reporting(-1);
 require_once('nyt-api.php');
 require_once('display-nyt-lists.php');
 
-$api_key = 'ab6166b63457ed361bf8af27ef9b8ef0:10:66006911';
+$api_key = 'key-goes-here';
 // instantiate class with api key
 $nyt_api = new NYT_API($api_key);
 // instantiate display class with api instance
