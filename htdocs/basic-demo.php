@@ -7,7 +7,7 @@ echo("Basic NYT API Demo<br>");
 $base_url = 'http://api.nytimes.com/svc/books/v2/lists/';
 
 // define API key
-$api_key = 'ab6166b63457ed361bf8af27ef9b8ef0:10:66006911';
+$api_key = 'key-goes-here';
 
 // define which list to retrieve
 $list_name = 'hardcover-fiction';
