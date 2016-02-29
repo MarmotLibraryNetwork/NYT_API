@@ -7,7 +7,7 @@ echo("NYT API Demo<br>");
 require_once('nyt-api.php');
 
 // define API key
-$api_key = 'ab6166b63457ed361bf8af27ef9b8ef0:10:66006911';
+$api_key = 'key-goes-here';
 
 // choose which list to display
 $list_name = 'names'; // returns the names of Times best-seller lists.
