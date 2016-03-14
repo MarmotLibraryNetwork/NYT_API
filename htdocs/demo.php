@@ -1,5 +1,8 @@
 <?php
 
+// Do initial application-wide set up
+require_once 'bootstrap.php';
+
 // sanity check output to screen
 echo("NYT API Demo<br>");
 
@@ -7,7 +10,7 @@ echo("NYT API Demo<br>");
 require_once('nyt-api.php');
 
 // define API key
-$api_key = 'key-goes-here';
+$api_key = $config['books_API_key'];
 
 // choose which list to display
 $list_name = 'names'; // returns the names of Times best-seller lists.

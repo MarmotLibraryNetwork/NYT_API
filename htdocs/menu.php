@@ -7,10 +7,14 @@
 ini_set('display_startup_errors',1);
 ini_set('display_errors',1);
 error_reporting(-1);
+
+// Do initial application-wide set up
+require_once 'bootstrap.php';
+
 require_once('nyt-api.php');
 require_once('display-nyt-lists.php');
 
-$api_key = 'key-goes-here';
+$api_key = $config['books_API_key'];
 // instantiate class with api key
 $nyt_api = new NYT_API($api_key);
 // instantiate display class with api instance

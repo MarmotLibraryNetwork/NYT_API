@@ -1,5 +1,8 @@
 <?php
 
+// Do initial application-wide set up
+require_once 'bootstrap.php';
+
 // sanity check output to screen
 echo("Basic NYT API Demo<br>");
 
@@ -7,7 +10,7 @@ echo("Basic NYT API Demo<br>");
 $base_url = 'http://api.nytimes.com/svc/books/v2/lists/';
 
 // define API key
-$api_key = 'key-goes-here';
+$api_key = $config['books_API_key'];
 
 // define which list to retrieve
 $list_name = 'hardcover-fiction';
