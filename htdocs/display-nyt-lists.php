@@ -35,6 +35,25 @@ class Display_NYT_Lists {
         return $array['results'];
     }
 
+    protected function get_pika_link($isbn) {
+      require_once 'pika-api.php';
+      $pikaHandler = new Pika_API();
+	    $response = $pikaHandler->getTitlebyISBN($isbn);
+	    if (!empty($response)) {
+		    $links = array();
+		    $results = json_decode($response, true);
+		    foreach ($results['result'] as $resultItem) {
+			    if (!empty($resultItem['id'])) {
+				    $links[] = 'http://' . $pikaHandler->base_url . '/GroupedWork/' . $resultItem['id'] . '/Home';
+				    //TODO: set protocol dynamically
+				    }
+		    }
+		    return $links;
+	    } else {
+		    return false;
+	    }
+    }
+
     protected function output_menu(array $lists){
         echo('<h2>NYT Lists Menu</h2>');
         echo('<ul class="menu">');
@@ -61,6 +80,15 @@ class Display_NYT_Lists {
             echo('<div class="title">' . $details['title'] . '</div>');
             echo('<div class="author">by ' . $details['author'] . '</div>');
             echo('<div class="description">' . $details['description'] . '</div>');
+
+	        if (!empty($item['pika_links'])) {
+		        echo '<div class="library_links">';
+		        foreach ($item['pika_links'] as $link) {
+			        echo '<a href="' . $link . '">Find it at the Library now</a><br>';
+		        }
+		        echo '</div>';
+	        }
+
             echo('<a href="' . $url . '">Buy it now</a>');
             echo('</li>');
         }
@@ -73,6 +101,26 @@ class Display_NYT_Lists {
         if ( $this->list_name == self::LIST_MENU ) {
             $this->output_menu($list_data);
         } else {
+
+	        foreach( $list_data as $i => $list_item) {
+		        // go through each list item
+		        if (!empty($list_item['isbns'])) {
+			        foreach ($list_item['isbns'] as $isbns) {
+				        $isbn = empty($isbns['isbn13']) ? $isbns['isbn10'] : $isbns['isbn13'];
+				        if ($isbn) {
+					        $pika_link = $this->get_pika_link($isbn);
+					        if ($pika_link) {
+						        $list_data[$i]['pika_links'] = $pika_link;
+						        break;
+					        }
+				        }
+			        }
+		        }
+	        }
+
+
+
+
             $this->output_list($list_data);
         }
     }

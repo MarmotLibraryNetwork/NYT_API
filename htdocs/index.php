@@ -40,9 +40,9 @@
     <h1>NYT API Demo Index</h1>
  
     <ul>
-        <li><a href="/basic-demo">Super Basic Demo</a></li>
-        <li><a href="/demo">Slightly Less Basic Demo</a></li>
-        <li><a href="/menu">More Interesting Demo</a></li>
+        <li><a href="basic-demo.php">Super Basic Demo</a></li>
+        <li><a href="demo.php">Slightly Less Basic Demo</a></li>
+        <li><a href="menu.php">More Interesting Demo</a> (Now with Pika links!)</li>
     </ul>
 </body>
 </html>
