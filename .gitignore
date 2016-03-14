@@ -3,3 +3,6 @@
 .idea/NYT_API.iml
 .idea/workspace.xml
 .idea/vcs.xml
+
+# Password Configuration File
+/config.pwd.ini
