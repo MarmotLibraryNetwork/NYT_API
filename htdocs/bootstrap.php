@@ -7,6 +7,10 @@
  * Date: 3/14/2016
  *
  */
- global $config; // ensure this variable is available to entire application
+global $config; // ensure this variable is available to entire application
 
- $config = parse_ini_file('../config.pwd.ini'); // load protected settings
+//TODO: Someday we should account for people living someplace besides Denver
+date_default_timezone_set('America/Denver');
+
+$config = parse_ini_file('../config.pwd.ini'); // load protected settings
+

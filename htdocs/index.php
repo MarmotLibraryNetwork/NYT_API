@@ -43,6 +43,7 @@
         <li><a href="basic-demo.php">Super Basic Demo</a></li>
         <li><a href="demo.php">Slightly Less Basic Demo</a></li>
         <li><a href="menu.php">More Interesting Demo</a> (Now with Pika links!)</li>
+        <li><a href="list.php">Find/Make a List</a></li>
     </ul>
 </body>
 </html>
