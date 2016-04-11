@@ -41,6 +41,16 @@ if ($isListSelected){
 	$pikaPassword = $config['pika_password'];
 	$pikaUrl = $config['pika_url'];
 
+	//Get the human readable title for our selected list
+	$selectedListTitle = null;
+	//Get the title and description for the selected list
+	foreach ($availableLists->results as $listInformation){
+		if ($listInformation->list_name_encoded == $selectedList){
+			$selectedListTitle = $listInformation->display_name;
+			break;
+		}
+	}
+
 	//Call Pika to get a list of all lists for our username
 	$apiUrl = $pikaUrl . "/API/ListAPI?method=getUserLists&username=" . urlencode($pikaUsername) . "&password=" . urlencode($pikaPassword);
 	$getUserListResults = file_get_contents($apiUrl);
@@ -49,8 +59,27 @@ if ($isListSelected){
 	//Loop through the set of all lists to see if we have one by this name
 	$listExistsInPika = false;
 	foreach ($getUserListResultsJSON->result->lists as $listName){
-		if ($listName == $selectedList){
+		//Compare the list name from Pika to the human readable name
+		if ($listName->title == $selectedListTitle){
 			$listExistsInPika = true;
+			break;
+		}
+	}
+
+	//We didn't get a list in Pika, create one
+	if (!$listExistsInPika){
+		//Call the create list API
+		$createListUrl = $pikaUrl . "/API/ListAPI?method=createList&username=" . urlencode($pikaUsername) .
+				"&password=" . urlencode($pikaPassword) .
+				"&title=" . urlencode($selectedListTitle) .
+				"&public=1";
+		$createListResultRaw = file_get_contents($createListUrl);
+		$createListResult = json_decode($createListResultRaw);
+
+		if ($createListResult->result->success){
+			$newlyCreatedListId = $createListResult->result->listId;
+		}else{
+			$createListError = $createListResult->result->message;
 		}
 	}
 }
@@ -63,8 +92,14 @@ if ($isListSelected){
 	<body>
 		<h1>Create Lists in Pika for NYT List</h1>
 		<?php
-			if ($isListSelected && !$listExistsInPika){
-				echo("The list did not exist in Pika");
+			if (isset($createListError)){
+				echo($createListError);
+			}else if ($isListSelected && !$listExistsInPika){
+				if (isset($newlyCreatedListId)){
+					echo("Created List <a href='$pikaUrl/MyAccount/MyList/$newlyCreatedListId'>$newlyCreatedListId</a>");
+				}else{
+					echo("The list did not exist in Pika");
+				}
 			}
 		?>
 		<form action="list.php" method="get">
