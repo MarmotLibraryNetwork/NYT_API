@@ -62,6 +62,7 @@ if ($isListSelected){
 		//Compare the list name from Pika to the human readable name
 		if ($listName->title == $selectedListTitle){
 			$listExistsInPika = true;
+			$listID = $listName->id;
 			break;
 		}
 	}
@@ -69,19 +70,71 @@ if ($isListSelected){
 	//We didn't get a list in Pika, create one
 	if (!$listExistsInPika){
 		//Call the create list API
-		$createListUrl = $pikaUrl . "/API/ListAPI?method=createList&username=" . urlencode($pikaUsername) .
+		$addTitlesToListURL = $pikaUrl . "/API/ListAPI?method=createList&username=" . urlencode($pikaUsername) .
 				"&password=" . urlencode($pikaPassword) .
 				"&title=" . urlencode($selectedListTitle) .
 				"&public=1";
-		$createListResultRaw = file_get_contents($createListUrl);
+		$createListResultRaw = file_get_contents($addTitlesToListURL);
 		$createListResult = json_decode($createListResultRaw);
 
 		if ($createListResult->result->success){
 			$newlyCreatedListId = $createListResult->result->listId;
+			$listID = $newlyCreatedListId;
 		}else{
 			$createListError = $createListResult->result->message;
 		}
 	}
+	// We need to add titles to the list
+	//Get a list of titles from NYT API
+	$availableListsRaw = $nyt_api->get_list($selectedList);
+	$availableLists = json_decode($availableListsRaw);
+	$listPikaIDs=array();
+	foreach ($availableLists->results as $titleResult){
+		// go through each list item
+		if (!empty($titleResult->isbns)) {
+			foreach ($titleResult->isbns as $isbns) {
+				$isbn = empty($isbns->isbn13) ? $isbns->isbn10 : $isbns->isbn13;
+				if ($isbn) {
+					//look the title up in Pika by ISBN
+					require_once 'pika-api.php';
+					$pikaHandler = new Pika_API();
+					$response = $pikaHandler->getTitlebyISBN($isbn);
+					if (!empty($response)) {
+						$results = json_decode($response, true);
+						foreach ($results['result'] as $resultItem) {
+							if (!empty($resultItem['id'])) {
+								$pikaID = $resultItem['id'];
+								$listPikaIDs[$pikaID]=$pikaID;
+								break;
+							}
+						}
+					}
+				}//todo break if we found a pika id for the title (jordan)
+			}
+		}
+	}
+	//Add them to the list
+	//Call the create list API
+	$tempRecordIds='';
+	foreach($listPikaIDs as $pikaRecordId){
+		$tempRecordIds.='&recordIds[]='.$pikaRecordId;
+	}
+	$addTitlesToListURL = $pikaUrl . "/API/ListAPI?method=addTitlesToList&username=" . urlencode($pikaUsername) .
+			"&password=" . urlencode($pikaPassword) .
+			"&listId=" . urlencode($listID) .
+			$tempRecordIds;
+
+	$createListResultRaw = file_get_contents($addTitlesToListURL);
+	$createListResult = json_decode($createListResultRaw);
+/*
+//Tell the user what happened (jordan)
+	if ($createListResult->result->success){
+		$newlyCreatedListId = $createListResult->result->listId;
+	}else{
+		$createListError = $createListResult->result->message;
+	}
+	*/
+	echo "test";
 }
 
 ?>
